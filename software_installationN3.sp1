@@ -10,6 +10,8 @@ $WinRAR = $Path + "winrar_x64.exe"
 $Chrome = $Path + "ChromeSetup.exe"
 # Imagen del disco de instalacion de office
 $Office = $Path + "ProPlus2021Retail.img"
+# Variable de almacenamiento de la letra de disco
+$OfficeDev = ""
 
 try {    
     # Instala el sofware como Admin
@@ -30,7 +32,7 @@ try {
     # Monta el disco de office
     Mount-DiskImage -ImagePath $Office
     # Obtiene la letra asociada al disco montado
-    Get-DiskImage -DevicePath \\.\CDROM1 | Get-Volume
+    $OfficeDev = Get-DiskImage -DevicePath \\.\CDROM1 | Get-Volume
 
 
     # Elimina la carpeta de instalación
