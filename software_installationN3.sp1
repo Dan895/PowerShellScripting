@@ -29,8 +29,9 @@ try {
 
     # Monta el disco de office
     Mount-DiskImage -ImagePath $Office
-    # Ingresa al disco montado
-    
+    # Obtiene la letra asociada al disco montado
+    Get-DiskImage -DevicePath \\.\CDROM1 | Get-Volume
+
 
     # Elimina la carpeta de instalación
     Write-Host -f Yellow "Removiendo carpeta de instalación..."
