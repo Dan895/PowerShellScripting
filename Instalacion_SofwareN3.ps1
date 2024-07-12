@@ -4,7 +4,7 @@
 # Ruta del software
 # Obtine la ruta de acceso de los archivos
 $Pathfiles = Get-Location
-Write-Host -f Yellow "Ruta de archivos"
+Write-Host -ForegroundColor Yellow "Ruta de archivos: $Pathfiles"
 
 # Instaladores
 $Adobe = Join-Path -Path $Pathfiles -ChildPath "AcrobatReader.exe"
@@ -16,41 +16,40 @@ $OfficeDrive = Join-Path -Path $Pathfiles -ChildPath "ProPlus2021Retail.img"
 
 try {    
     # Instala el sofware como Admin
-    Write-Host -f Yellow "Iniciando instalación del software..."
+    Write-Host -ForegroundColor Yellow "Iniciando instalación del software..."
 
-    Write-Host -f DarkBlue "Iniciando la instalación de Adobe Reader"
-    Start-Process -FilePath $Adobe -ArgumentList "/S" -Verb RunAs -Wait
-    Write-Host -f Green "Sofware instalado con éxito!"
+    Write-Host -ForegroundColor DarkBlue "Iniciando la instalación de Adobe Reader"
+    Start-Process -FilePath $Adobe -ArgumentList "/sAll /msi /norestart /quiet" -Verb RunAs -Wait
+    Write-Host -ForegroundColor Green "Adobe Reader instalado con éxito!"
 
-    Write-Host -f DarkBlue "Iniciando la instalación de Win$WinRAR"
+    Write-Host -ForegroundColor DarkBlue "Iniciando la instalación de WinRAR"
     Start-Process -FilePath $WinRAR -ArgumentList "/S" -Verb RunAs -Wait
-    Write-Host -f Green "Sofware instalado con éxito!"
+    Write-Host -ForegroundColor Green "WinRAR instalado con éxito!"
 
-    Write-Host -f DarkBlue "Iniciando la instalación de Google Chrome"
-    Start-Process -FilePath $Chrome -ArgumentList "/S" -Verb RunAs -Wait
-    Write-Host -f Green "Sofware instalado con éxito!"
+    Write-Host -ForegroundColor DarkBlue "Iniciando la instalación de Google Chrome"
+    Start-Process -FilePath $Chrome -ArgumentList "/silent /install" -Verb RunAs -Wait
+    Write-Host -ForegroundColor Green "Google Chrome instalado con éxito!"
 
-    # Monta el disco de office
+    # Monta el disco de Office
+    Write-Host -ForegroundColor Yellow "Montando la imagen de Office..."
     Mount-DiskImage -ImagePath $OfficeDrive
     # Obtiene la letra asociada al disco montado
-    Write-Host -f Yellow "Drive mounted in..."
-    $DriveLetter = (Mount-DiskImage "$OfficeDrive" -PassThru | Get-Volume).DriveLetter
-    $DriveLetter
+    $DriveLetter = (Get-Volume -DiskImagePath $OfficeDrive).DriveLetter
+    Write-Host -ForegroundColor Yellow "Disco montado en la unidad: $DriveLetter"
 
-    Write-Host -f Yellow "Executing installer..."
-    $OfficeSetup = $DriveLetter + ":\Setup.exe"
-    $SetupPath
-    Start-Process -FilePath $OfficeSetup -ArgumentList "\S" -Verb -RunAs -Wait
+    Write-Host -ForegroundColor Yellow "Ejecutando el instalador de Office..."
+    $OfficeSetup = Join-Path -Path "$DriveLetter`:" -ChildPath "Setup.exe"
+    Start-Process -FilePath $OfficeSetup -ArgumentList "/configure configuration.xml" -Verb RunAs -Wait
 
     # Desmonta la unidad
-    Write-Host -f Yellow "Dismounting disk..."
-    Dismount-DiskImage -ImagePath $Office
+    Write-Host -ForegroundColor Yellow "Desmontando la imagen de disco..."
+    Dismount-DiskImage -ImagePath $OfficeDrive
 
     # Elimina la carpeta de instalación
-    Write-Host -f Yellow "Removiendo carpeta de instalación..."
+    Write-Host -ForegroundColor Yellow "Removiendo carpeta de instalación..."
     Remove-Item $Pathfiles -Force -Recurse
-    Write-Host -f Green "Hecho!"   
+    Write-Host -ForegroundColor Green "Proceso completado con éxito!"   
 }
 catch {
-    Write-Host -f Red "Error: " $_.Exception.Message
+    Write-Host -ForegroundColor Red "Error: $_.Exception.Message"
 }
